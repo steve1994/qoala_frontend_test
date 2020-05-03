@@ -1,0 +1,36 @@
+::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    background: transparent;
+}
+
+.container-card-horizontal {
+    width: 350px;
+    height: 60vh;
+    display: inline-block;
+    margin-right: 50px;
+    overflow-x: scroll;
+}
+
+.container-card-vertical {
+    width: 100vw;
+    height: 100vw;
+    margin-bottom: 50px;
+    overflow-x: scroll;
+}
+
+.filter-button {
+    padding: 10px 20px 10px 20px;
+}
+
+.scroll-horizontal-window {
+    width: 100%;
+    height: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.scroll-vertical-window {
+    width: 100vw;
+    height: 100vh;
+    -webkit-overflow-scrolling: touch;
+}

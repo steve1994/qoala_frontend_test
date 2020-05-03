@@ -2,7 +2,7 @@ import React, { useState, useEffect, Component } from 'react';
 import InfiniteScroll from 'react-bidirectional-infinite-scroll';
 import {fetchApiUsers} from '../services/api';
 import * as func from '../helper/util';
-import './css/index.css';
+import '~/public/css/index.css';
 
 const Home = () => {
 
@@ -38,29 +38,22 @@ const Home = () => {
         return (
             <>
                 {data.map(item => (
-                    <div
-                      className="row p-4"
-                      style={{
-                        width: '350px',
-                        height: '60vh',
-                        display: 'inline-block',
-                        backgroundColor: func.determineBackgroundColorBasedOnAge(item.dob.age),
-                        marginRight: '50px'}}>
-                          <div className="col-12 text-center mb-3" style={{overflowX:'scroll'}}>
-                              <img src={item.picture.large} style={{width:'150px'}} />
-                          </div>
-                          <div className="col-12" style={{overflowX:'scroll'}}>
-                              {item.name.title}{' '}{item.name.first}{' '}{item.name.last}
-                          </div>
-                          <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
-                              Age : {item.dob.age}
-                          </div>
-                          <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
-                              Location : {item.location.city}{', '}{item.location.state}{', '}{item.location.postcode}
-                          </div>
-                          <div className="col-12" style={{overflowX:'scroll'}}>
-                              Email : {item.email}
-                          </div>
+                    <div className="row p-4 container-card-horizontal" style={{backgroundColor:func.determineBackgroundColorBasedOnAge(item.dob.age)}}>
+                        <div className="col-12 text-center mb-3">
+                            <img src={item.picture.large} style={{width:'150px'}} />
+                        </div>
+                        <div className="col-12">
+                            {item.name.title}{' '}{item.name.first}{' '}{item.name.last}
+                        </div>
+                        <div className="col-12 mb-3">
+                            Age : {item.dob.age}
+                        </div>
+                        <div className="col-12 mb-3">
+                            Location : {item.location.city}{', '}{item.location.state}{', '}{item.location.postcode}
+                        </div>
+                        <div className="col-12">
+                            Email : {item.email}
+                        </div>
                     </div>
                 ))}
             </>
@@ -71,36 +64,30 @@ const Home = () => {
         return (
             <>
                 {data.map(item => (
-                    <div
-                      className="row p-4"
-                      style={{
-                        width: '100vw',
-                        height: '100vw',
-                        backgroundColor: func.determineBackgroundColorBasedOnAge(item.dob.age),
-                        marginBottom: '50px'}}>
-                          <div className="col-12 mb-3">
-                              <div className="row">
-                                  <div className="col-5 text-left">
-                                      <img src={item.picture.large} style={{width:'100%'}} />
-                                  </div>
-                                  <div className="col-7 text-left">
-                                      <div className="row h-100">
-                                          <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
-                                              {item.name.title}{' '}{item.name.first}{' '}{item.name.last}
-                                          </div>
-                                          <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
-                                              Age : {item.dob.age}
-                                          </div>
-                                          <div className="col-12" style={{overflowX:'scroll'}}>
-                                              Email : {item.email}
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
-                          <div className="col-12" style={{overflowX:'scroll'}}>
-                              Location : {item.location.city}{', '}{item.location.state}{', '}{item.location.postcode}
-                          </div>
+                    <div className="row p-4 container-card-vertical" style={{backgroundColor: func.determineBackgroundColorBasedOnAge(item.dob.age)}}>
+                        <div className="col-12 mb-3">
+                            <div className="row">
+                                <div className="col-5 text-left">
+                                    <img src={item.picture.large} style={{width:'100%'}} />
+                                </div>
+                                <div className="col-7 text-left">
+                                    <div className="row h-100">
+                                        <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
+                                            {item.name.title}{' '}{item.name.first}{' '}{item.name.last}
+                                        </div>
+                                        <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
+                                            Age : {item.dob.age}
+                                        </div>
+                                        <div className="col-12" style={{overflowX:'scroll'}}>
+                                            Email : {item.email}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="col-12" style={{overflowX:'scroll'}}>
+                            Location : {item.location.city}{', '}{item.location.state}{', '}{item.location.postcode}
+                        </div>
                     </div>
                 ))}
             </>
@@ -136,36 +123,26 @@ const Home = () => {
             <div className="row" style={{height:'100vh'}}>
                 <div className="col-12 my-3 align-self-start">
                     <div className="row align-items-center">
-                        <div className="col-6 text-left">
+                        <div className="col-4 text-left">
                             <h1>Qoala Test</h1>
                         </div>
-                        <div className="col-6 text-right">
-                            <button onClick={groupItemBasedOnColor}>Color</button>
+                        <div className="col-8 text-right pr-0">
+                            <button className="filter-button" onClick={groupItemBasedOnColor}>Color</button>
                             &nbsp;&nbsp;&nbsp;
-                            <button onClick={sortItemBasedOnCity}>Cities</button>
+                            <button className="filter-button" onClick={sortItemBasedOnCity}>Cities</button>
                         </div>
                     </div>
                 </div>
                 <div className="col-12">
                     <div className="d-none d-lg-block">
-                        <div
-                          style={{
-                            width: '100%',
-                            height: 'auto',
-                            WebkitOverflowScrolling: 'touch'
-                          }}>
+                        <div className="scroll-horizontal-window">
                             <InfiniteScroll onReachRight={loadMoreUsers} horizontal>
                                 {listUsersUIHorizontal}
                             </InfiniteScroll>
                         </div>
                     </div>
                     <div className="d-lg-none">
-                        <div
-                          style={{
-                            width: '100vw',
-                            height: '100vh',
-                            WebkitOverflowScrolling: 'touch'
-                          }}>
+                        <div className="scroll-vertical-window">
                             <InfiniteScroll onReachBottom={loadMoreUsers} vertical>
                                 {listUsersUIVertical}
                             </InfiniteScroll>
