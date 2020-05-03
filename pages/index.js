@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Component } from 'react';
 import InfiniteScroll from 'react-bidirectional-infinite-scroll';
 import {fetchApiUsers} from '../services/api';
+import * as func from '../helper/util';
 import './css/index.css';
 
 const Home = () => {
@@ -13,42 +14,51 @@ const Home = () => {
     useEffect(() => {
         fetchApiUsers()
         .then(data => {
-            let currentListUsersData = listUsersData;
-            if (listUsersData.length == 0) {
-                currentListUsersData = data.results.slice(0,10);
-                setListUsersData(currentListUsersData);
-                setNumPage(1);
+            let temporaryData = localStorage.getItem('listUsers100') ? JSON.parse(localStorage.getItem('listUsers100')) : [];
+            if (temporaryData.length == 0) {
+                temporaryData = data.results;
+                setListUsersData(data.results);
+            } else {
+                setListUsersData(temporaryData);
             }
-            setListUsersUIHorizontal(loadUsersComponentHorizontal(currentListUsersData));
-            // setListUsersUIVertical(loadUsersComponentVertical(currentListUsersData));
+            let listAddedComponentHorizontal = loadUsersComponentHorizontal(temporaryData.slice(0,10));
+            let listAddedComponentVertical = loadUsersComponentVertical(temporaryData.slice(0,10));
+            setListUsersUIHorizontal(listUsersUIHorizontal.concat(listAddedComponentHorizontal));
+            setListUsersUIVertical(listUsersUIVertical.concat(listAddedComponentVertical));
         })
     }, [])
+
+    useEffect(() => {
+        return () => {
+            localStorage.setItem('listUsers100',JSON.stringify(listUsersData));
+        }
+    })
 
     const loadUsersComponentHorizontal = (data) => {
         return (
             <>
                 {data.map(item => (
                     <div
-                      className="row p-4 h-100"
+                      className="row p-4"
                       style={{
                         width: '350px',
-                        height: 'auto',
+                        height: '60vh',
                         display: 'inline-block',
-                        backgroundColor: (item.dob.age < 21) ? 'red' : ((item.dob.age >= 21 && item.dob.age < 56) ? 'green' : 'blue'),
+                        backgroundColor: func.determineBackgroundColorBasedOnAge(item.dob.age),
                         marginRight: '50px'}}>
-                          <div className="col-12 text-center mb-3" style={{'overflow-x':'scroll'}}>
+                          <div className="col-12 text-center mb-3" style={{overflowX:'scroll'}}>
                               <img src={item.picture.large} style={{width:'150px'}} />
                           </div>
-                          <div className="col-12" style={{'overflow-x':'scroll'}}>
+                          <div className="col-12" style={{overflowX:'scroll'}}>
                               {item.name.title}{' '}{item.name.first}{' '}{item.name.last}
                           </div>
-                          <div className="col-12 mb-3" style={{'overflow-x':'scroll'}}>
+                          <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
                               Age : {item.dob.age}
                           </div>
-                          <div className="col-12 mb-3" style={{'overflow-x':'scroll'}}>
+                          <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
                               Location : {item.location.city}{', '}{item.location.state}{', '}{item.location.postcode}
                           </div>
-                          <div className="col-12" style={{'overflow-x':'scroll'}}>
+                          <div className="col-12" style={{overflowX:'scroll'}}>
                               Email : {item.email}
                           </div>
                     </div>
@@ -58,25 +68,81 @@ const Home = () => {
     }
 
     const loadUsersComponentVertical = (data) => {
-
+        return (
+            <>
+                {data.map(item => (
+                    <div
+                      className="row p-4"
+                      style={{
+                        width: '100vw',
+                        height: '100vw',
+                        backgroundColor: func.determineBackgroundColorBasedOnAge(item.dob.age),
+                        marginBottom: '50px'}}>
+                          <div className="col-12 mb-3">
+                              <div className="row">
+                                  <div className="col-5 text-left">
+                                      <img src={item.picture.large} style={{width:'100%'}} />
+                                  </div>
+                                  <div className="col-7 text-left">
+                                      <div className="row h-100">
+                                          <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
+                                              {item.name.title}{' '}{item.name.first}{' '}{item.name.last}
+                                          </div>
+                                          <div className="col-12 mb-3" style={{overflowX:'scroll'}}>
+                                              Age : {item.dob.age}
+                                          </div>
+                                          <div className="col-12" style={{overflowX:'scroll'}}>
+                                              Email : {item.email}
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                          <div className="col-12" style={{overflowX:'scroll'}}>
+                              Location : {item.location.city}{', '}{item.location.state}{', '}{item.location.postcode}
+                          </div>
+                    </div>
+                ))}
+            </>
+        )
     }
 
-    const loadMoreUsersHorizontal = () => {
-        alert("TEST JALAN");
+    const loadMoreUsers = () => {
+        if (numPage + 1 <= 10) {
+            let listAddedComponentHorizontal = loadUsersComponentHorizontal(listUsersData.slice(numPage*10,(numPage+1)*10));
+            let listAddedComponentVertical = loadUsersComponentVertical(listUsersData.slice(numPage*10,(numPage+1)*10));
+            setListUsersUIHorizontal(listUsersUIHorizontal.concat(listAddedComponentHorizontal));
+            setListUsersUIVertical(listUsersUIVertical.concat(listAddedComponentVertical));
+            setNumPage(numPage + 1);
+        }
+    }
+
+    const groupItemBasedOnColor = (event) => {
+        let currentDataDisplayed = listUsersData.slice(0,numPage*10);
+        let groupedBasedColorResult = func.mergeGroupUserByAgeReducer(func.groupUserByAge(currentDataDisplayed));
+        setListUsersUIHorizontal([loadUsersComponentHorizontal(groupedBasedColorResult)]);
+        setListUsersUIVertical([loadUsersComponentVertical(groupedBasedColorResult)]);
+    }
+
+    const sortItemBasedOnCity = (event) => {
+        let currentDataDisplayed = listUsersData.slice(0,numPage*10);
+        let sortedBasedCityResult = func.sortUserByCity(currentDataDisplayed);
+        setListUsersUIHorizontal([loadUsersComponentHorizontal(sortedBasedCityResult)]);
+        setListUsersUIVertical([loadUsersComponentVertical(sortedBasedCityResult)]);
     }
 
     return (
         <div className="container">
             <div className="row" style={{height:'100vh'}}>
-                <div className="col-12 align-self-start">
+                <div className="col-12 my-3 align-self-start">
                     <div className="row align-items-center">
                         <div className="col-6 text-left">
                             <h1>Qoala Test</h1>
                         </div>
                         <div className="col-6 text-right">
-                            <button>Color</button>
+                            <button onClick={groupItemBasedOnColor}>Color</button>
                             &nbsp;&nbsp;&nbsp;
-                            <button>Cities</button>
+                            <button onClick={sortItemBasedOnCity}>Cities</button>
                         </div>
                     </div>
                 </div>
@@ -88,8 +154,20 @@ const Home = () => {
                             height: 'auto',
                             WebkitOverflowScrolling: 'touch'
                           }}>
-                            <InfiniteScroll onReachRight={loadMoreUsersHorizontal} horizontal>
+                            <InfiniteScroll onReachRight={loadMoreUsers} horizontal>
                                 {listUsersUIHorizontal}
+                            </InfiniteScroll>
+                        </div>
+                    </div>
+                    <div className="d-lg-none">
+                        <div
+                          style={{
+                            width: '100vw',
+                            height: '100vh',
+                            WebkitOverflowScrolling: 'touch'
+                          }}>
+                            <InfiniteScroll onReachBottom={loadMoreUsers} vertical>
+                                {listUsersUIVertical}
                             </InfiniteScroll>
                         </div>
                     </div>
@@ -98,86 +176,5 @@ const Home = () => {
         </div>
     )
 }
-
-
-
-// class Home extends Component {
-//
-//     constructor(props) {
-//         super(props);
-//         this.state = {counter:0,listUsers:[]}
-//     }
-//
-//     componentDidMount() {
-//         let newList = this.state.listUsers.concat(this.getMoreItems());
-//         this.setState({counter:this.state.counter+1,listUsers:newList});
-//     }
-//
-//     getMoreItems = () => {
-//         let copyListUsers = [];
-//         for (let i=this.state.counter;i<this.state.counter+10;i++) {
-//             copyListUsers.push(`Macadamia ${i}`);
-//         }
-//         return (
-//             <>
-//                 {
-//                     copyListUsers.map(item => (
-//                         <div
-//                           style={{
-//                             width: '300px',
-//                             height: '160px',
-//                             display: 'inline-block',
-//                             backgroundColor: 'yellow',
-//                             marginRight: '10px'}}>
-//                               {item}
-//                         </div>
-//                     ))
-//                 }
-//             </>
-//         )
-//     }
-//
-//     loadMoreUsers = () => {
-//         alert("KELUAR LHO");
-//         let newList = this.state.listUsers.concat(this.getMoreItems());
-//         this.setState({counter:this.state.counter+11,listUsers:newList});
-//     }
-//
-//
-//     render() {
-//         return (
-//             <div className="container">
-//                 <div className="row" style={{height:'100vh'}}>
-//                     <div className="col-12 align-self-start">
-//                         <div className="row align-items-center">
-//                             <div className="col-6 text-left">
-//                                 <h1>Qoala Test</h1>
-//                             </div>
-//                             <div className="col-6 text-right">
-//                                 <button>Color</button>
-//                                 &nbsp;&nbsp;&nbsp;
-//                                 <button>Cities</button>
-//                             </div>
-//                         </div>
-//                     </div>
-//                     <div className="col-12">
-//                         <div className="d-none d-md-block">
-//                             <div
-//                               style={{
-//                                 width: '100%',
-//                                 height: '200px',
-//                                 WebkitOverflowScrolling: 'touch'
-//                               }}>
-//                                 <InfiniteScroll onReachRight={this.loadMoreUsers} horizontal>
-//                                     {this.state.listUsers}
-//                                 </InfiniteScroll>
-//                             </div>
-//                         </div>
-//                     </div>
-//                 </div>
-//             </div>
-//         )
-//     }
-// }
 
 export default Home;
