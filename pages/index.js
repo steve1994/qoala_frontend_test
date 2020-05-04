@@ -109,13 +109,16 @@ const Home = () => {
     }
 
     const loadMoreUsers = () => {
-        if (numPage + 1 <= 10) {
-            let listAddedComponentHorizontal = loadUsersComponentHorizontal(listUsersData.slice(numPage*10,(numPage+1)*10));
-            let listAddedComponentVertical = loadUsersComponentVertical(listUsersData.slice(numPage*10,(numPage+1)*10));
-            setListUsersUIHorizontal(listUsersUIHorizontal.concat(listAddedComponentHorizontal));
-            setListUsersUIVertical(listUsersUIVertical.concat(listAddedComponentVertical));
-            setNumPage(numPage + 1);
+        const loadNewComponent = () => {
+            if (numPage + 1 <= 10) {
+                let listAddedComponentHorizontal = loadUsersComponentHorizontal(listUsersData.slice(numPage*10,(numPage+1)*10));
+                let listAddedComponentVertical = loadUsersComponentVertical(listUsersData.slice(numPage*10,(numPage+1)*10));
+                setListUsersUIHorizontal(listUsersUIHorizontal.concat(listAddedComponentHorizontal));
+                setListUsersUIVertical(listUsersUIVertical.concat(listAddedComponentVertical));
+                setNumPage(numPage + 1);
+            }
         }
+        setTimeout(loadNewComponent, 2000);
     }
 
     const groupItemBasedOnColor = (event) => {
