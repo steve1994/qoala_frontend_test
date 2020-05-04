@@ -110,7 +110,6 @@ const Home = () => {
 
     const loadMoreUsers = () => {
         if (numPage + 1 <= 10) {
-            alert("LOAD MORE USER");
             let listAddedComponentHorizontal = loadUsersComponentHorizontal(listUsersData.slice(numPage*10,(numPage+1)*10));
             let listAddedComponentVertical = loadUsersComponentVertical(listUsersData.slice(numPage*10,(numPage+1)*10));
             setListUsersUIHorizontal(listUsersUIHorizontal.concat(listAddedComponentHorizontal));
