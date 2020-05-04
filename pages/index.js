@@ -21,8 +21,11 @@ const Home = () => {
             } else {
                 setListUsersData(temporaryData);
             }
-            let listAddedComponentHorizontal = loadUsersComponentHorizontal(temporaryData.slice(0,10));
-            let listAddedComponentVertical = loadUsersComponentVertical(temporaryData.slice(0,10));
+            let temporaryNumPage = localStorage.getItem('page_listUsers100') ? parseInt(localStorage.getItem('page_listUsers100')) : 1;
+            setNumPage(temporaryNumPage);
+
+            let listAddedComponentHorizontal = loadUsersComponentHorizontal(temporaryData.slice(0,temporaryNumPage * 10));
+            let listAddedComponentVertical = loadUsersComponentVertical(temporaryData.slice(0,temporaryNumPage * 10));
             setListUsersUIHorizontal(listUsersUIHorizontal.concat(listAddedComponentHorizontal));
             setListUsersUIVertical(listUsersUIVertical.concat(listAddedComponentVertical));
         })
@@ -33,6 +36,17 @@ const Home = () => {
             localStorage.setItem('listUsers100',JSON.stringify(listUsersData));
         }
     })
+
+    useEffect(() => {
+        return () => {
+            let pageFromLocalStorage = localStorage.getItem('page_listUsers100') ? parseInt(localStorage.getItem('page_listUsers100')) : 1;
+            if (pageFromLocalStorage == numPage) {
+                localStorage.setItem('page_listUsers100',numPage+1);
+            } else {
+                localStorage.setItem('page_listUsers100',pageFromLocalStorage);
+            }
+        }
+    }, [numPage])
 
     const loadUsersComponentHorizontal = (data) => {
         return (
@@ -96,6 +110,7 @@ const Home = () => {
 
     const loadMoreUsers = () => {
         if (numPage + 1 <= 10) {
+            alert("LOAD MORE USER");
             let listAddedComponentHorizontal = loadUsersComponentHorizontal(listUsersData.slice(numPage*10,(numPage+1)*10));
             let listAddedComponentVertical = loadUsersComponentVertical(listUsersData.slice(numPage*10,(numPage+1)*10));
             setListUsersUIHorizontal(listUsersUIHorizontal.concat(listAddedComponentHorizontal));

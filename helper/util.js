@@ -34,23 +34,22 @@ export const mergeGroupUserByAgeReducer = (obj) => {
     return mergeArray;
 }
 
+export const compareString = (a,b) => {
+    return a.toLowerCase().localeCompare(b.toLowerCase());
+}
+
 export const sortUserByCity = (arr) => {
-    let listCity = [];
-    let mapStringToIndex = {};
-    let counter = 1;
-    for (let i=0;i<arr.length;i++) {
-        listCity.push(arr[i].location.city);
-        if (mapStringToIndex[arr[i].location.city]) {
-            mapStringToIndex[arr[i].location.city + '-' + counter] = i;
-            counter++;
-        } else {
-            mapStringToIndex[arr[i].location.city] = i;
+    let isSorted;
+    do {
+        isSorted = true;
+        for (let i=0;i<arr.length-1;i++) {
+            if (compareString(arr[i].location.city,arr[i+1].location.city) > 0) {
+                let temp = arr[i];
+                arr[i] = arr[i+1];
+                arr[i+1] = temp;
+                isSorted = false;
+            }
         }
-    }
-    let sortedListCity = listCity.sort();
-    let listSortedUser = [];
-    for (let i=0;i<sortedListCity.length;i++) {
-        listSortedUser.push(arr[mapStringToIndex[sortedListCity[i]]]);
-    }
-    return listSortedUser;
+    } while (!isSorted);
+    return arr;
 }
